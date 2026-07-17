@@ -18,7 +18,7 @@ env-down:
 env-cleanup:
 	@read -p "Are you sure you want to remove all containers, volumes, and networks? (y/N) " answer; \
 	if [ "$$answer" = "y" ]; then \
-		docker compose down todoapp-postgres && \
+		docker compose down todoapp-postgres port-forwarder && \
 		rm -rf out/pgdata && \
 		echo "All containers, volumes, and networks have been removed."; \
 	else \
@@ -60,3 +60,9 @@ migrate-action:
 		-database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@todoapp-postgres:5432/${POSTGRES_DB}?sslmode=disable \
 		$(action)
 #например make migrate-action action="down 3" - откатить последние 3 миграции, чтобы не писать отдельные таргеты для каждой команды.
+
+todoapp-run:
+	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
+	export POSTGRES_HOST=localhost && \
+	go mod tidy && \
+	go run cmd/todoapp/main.go
