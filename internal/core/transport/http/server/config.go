@@ -8,8 +8,8 @@ import (
 )
 
 type Config struct {
-	Addr            string        `envconfig:"ADDR" required:"true"`             //адрес, на котором будет слушать сервер, например ":8080"
-	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" required:"true"` //таймаут на завершение работы сервера, чтобы корректно завершить все текущие запросы и закрыть соединения
+	Addr            string        `envconfig:"ADDR" required:"true"`           //адрес, на котором будет слушать сервер, например ":8080"
+	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"` //таймаут на завершение работы сервера, чтобы корректно завершить все текущие запросы и закрыть соединения
 }
 
 func NewConfig() (Config, error) {

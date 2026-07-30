@@ -20,7 +20,7 @@ func (r *UsersRepository) GetUsers(
 	FROM todoapp.users
 	ORDER BY id ASC
 	LIMIT $1 
-	OFFSET $2
+	OFFSET $2;
 	`
 	//если limit/offset = nil то они просто не будут учитываться при выполнении sql запроса
 	rows, err := r.pool.Query(ctx, query, limit, offset)

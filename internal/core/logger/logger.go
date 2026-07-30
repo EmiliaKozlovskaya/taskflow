@@ -11,15 +11,29 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+type loggerContextKey struct{}
+
+var (
+	key = loggerContextKey{}
+)
+
 type Logger struct {
 	*zap.Logger //объявляем не как поле, а как встраиваемый тип
 	//поэтому можем напрямую использовать методы zap.Logger, например, logger.Info("message"), а не logger.Logger.Info("message")
 	file *os.File
 }
 
+func ToContext(ctx context.Context, log *Logger) context.Context {
+	return context.WithValue(
+		ctx,
+		key,
+		log,
+	)
+}
+
 // пишем новый конструктор, который из контекста будет доставать логгер, который мы положили туда в middleware Logger(common.go)
 func FromContext(ctx context.Context) *Logger {
-	log, ok := ctx.Value("log").(*Logger) //получаем логгер из контекста, который мы положили туда в middleware Logger
+	log, ok := ctx.Value(key).(*Logger) //получаем логгер из контекста, который мы положили туда в middleware Logger
 	if !ok {
 		panic("logger not found in context") //если логгер не найден в контексте, то вызываем панику, чтобы остановить выполнение программы и вывести сообщение об ошибке
 	}

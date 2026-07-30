@@ -19,7 +19,7 @@ env-cleanup:
 	@read -p "Are you sure you want to remove all containers, volumes, and networks? (y/N) " answer; \
 	if [ "$$answer" = "y" ]; then \
 		docker compose down todoapp-postgres port-forwarder && \
-		rm -rf out/pgdata && \
+		rm -rf ${PROJECT_ROOT}/out/pgdata && \
 		echo "All containers, volumes, and networks have been removed."; \
 	else \
 		echo "Cleanup cancelled."; \
@@ -65,4 +65,4 @@ todoapp-run:
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
 	export POSTGRES_HOST=localhost && \
 	go mod tidy && \
-	go run cmd/todoapp/main.go
+	go run ${PROJECT_ROOT}/cmd/todoapp/main.go

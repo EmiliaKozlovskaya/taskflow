@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
-	core_http_server "github.com/Emilia20112005/golang-todoapp/internal/core/transport/server"
+	core_http_server "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/server"
 )
 
 // Слои приложения не должны напрямую зависеть друг от друга, а должны взаимодействовать через интерфейсы.

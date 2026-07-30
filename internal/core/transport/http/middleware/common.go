@@ -2,7 +2,6 @@
 package core_http_middleware
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -44,8 +43,34 @@ func Logger(log *core_logger.Logger) Middleware {
 				zap.String("request_id", requestID),
 				zap.String("url", r.URL.String()),
 			)
-			ctx := context.WithValue(r.Context(), "log", l) //создаем новый контекст, в котором будет храниться логгер с добавленными полями (request_id и url), чтобы его можно было использовать в других местах приложения
-			next.ServeHTTP(w, r.WithContext(ctx))           // передаем запрос с новым контекстом дальше
+			ctx := core_logger.ToContext(r.Context(), l) //создаем новый контекст, в котором будет храниться логгер с добавленными полями (request_id и url), чтобы его можно было использовать в других местах приложения
+			next.ServeHTTP(w, r.WithContext(ctx))        // передаем запрос с новым контекстом дальше
+		})
+	}
+}
+
+// Middleware для логирования всех входящих HTTP запросов и исходящих HTTP ответов. Логируем метод, URL, статус код ответа и время обработки запроса.
+func Trace() Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			log := core_logger.FromContext(ctx)
+			rw := core_http_response.NewResponseWriter(w)
+
+			before := time.Now()
+			log.Debug(
+				">>> incoming HTTP request",
+				zap.String("http_method", r.Method),
+				zap.Time("time", before.UTC()),
+			)
+			next.ServeHTTP(rw, r) //здесь происходит вызов самого хэндлера (например CreateUser), который уже имеет и request_id, и обогащенный логгер и отловленную панику
+
+			//здесь хотим еще получать статус код ответа, но напрямую достать его из http.ResponseWriter нельзя, поэтому нужно создать свой ResponseWriter, который будет оборачивать оригинальный и сохранять статус код ответа.
+			log.Debug(
+				"<<< done HTTP request",
+				zap.Int("status_code", rw.GetStatusCode()),
+				zap.Duration("latency", time.Since(before)),
+			)
 		})
 	}
 }
@@ -72,32 +97,6 @@ func Panic() Middleware {
 				}
 			}()
 			next.ServeHTTP(w, r)
-		})
-	}
-}
-
-// Middleware для логирования всех входящих HTTP запросов и исходящих HTTP ответов. Логируем метод, URL, статус код ответа и время обработки запроса.
-func Trace() Middleware {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
-			log := core_logger.FromContext(ctx)
-			rw := core_http_response.NewResponseWriter(w)
-
-			before := time.Now()
-			log.Debug(
-				">>> incoming HTTP request",
-				zap.String("http_method", r.Method),
-				zap.Time("time", before.UTC()),
-			)
-			next.ServeHTTP(rw, r) //здесь происходит вызов самого хэндлера (например CreateUser), который уже имеет и request_id, и обогащенный логгер и отловленную панику
-
-			//здесь хотим еще получать статус код ответа, но напрямую достать его из http.ResponseWriter нельзя, поэтому нужно создать свой ResponseWriter, который будет оборачивать оригинальный и сохранять статус код ответа.
-			log.Debug(
-				"<<< done HTTP request",
-				zap.Int("status_code", rw.GetStatusCodeOrPanic()),
-				zap.Duration("latency", time.Since(before)),
-			)
 		})
 	}
 }
