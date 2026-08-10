@@ -11,7 +11,7 @@ import (
 //query parameters будут двух видов (для get_users limit & offset) и (для get_statistics дата from & to)
 //не будем мудрить напишем две отдельные функции
 
-func GetQueryParams(r *http.Request, key string) (*int, error) {
+func GetIntQueryParam(r *http.Request, key string) (*int, error) {
 	param := r.URL.Query().Get(key)
 	if param == "" {
 		return nil, nil

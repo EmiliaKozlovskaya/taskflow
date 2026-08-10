@@ -29,7 +29,6 @@ CREATE TABLE todoapp.tasks (
     completed      BOOLEAN         NOT NULL,
     created_at     TIMESTAMPTZ     NOT NULL,
     completed_at   TIMESTAMPTZ,
-    user_id        INT             NOT NULL,
 
     CHECK(
     (completed = FALSE AND completed_at IS NULL) --Если задача не выполнена, то completed_at должно быть NULL
