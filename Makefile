@@ -60,6 +60,15 @@ migrate-action:
 		-database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@todoapp-postgres:5432/${POSTGRES_DB}?sslmode=disable \
 		$(action)
 #например make migrate-action action="down 3" - откатить последние 3 миграции, чтобы не писать отдельные таргеты для каждой команды.
+logs-cleanup:
+	@read -p "Are you sure you want to remove all logs? (y/N) " answer; \
+	if [ "$$answer" = "y" ]; then \
+		rm -rf ${PROJECT_ROOT}/out/logs && \
+		echo "All logs have been removed."; \
+	else \
+		echo "Cleanup cancelled."; \
+	fi
+
 
 todoapp-run:
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
