@@ -13,6 +13,9 @@ import (
 	core_postgres_pool "github.com/Emilia20112005/golang-todoapp/internal/core/repository/postgres/pool"
 	core_http_middleware "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/middleware"
 	core_http_server "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/server"
+	statistics_postgres_repository "github.com/Emilia20112005/golang-todoapp/internal/features/statistics/respository/postgres"
+	statistics_service "github.com/Emilia20112005/golang-todoapp/internal/features/statistics/service"
+	statisctics_transport_http "github.com/Emilia20112005/golang-todoapp/internal/features/statistics/transport/http"
 	tasks_postgres_repository "github.com/Emilia20112005/golang-todoapp/internal/features/tasks/repository/postgres"
 	tasks_service "github.com/Emilia20112005/golang-todoapp/internal/features/tasks/service"
 	tasks_transport_http "github.com/Emilia20112005/golang-todoapp/internal/features/tasks/transport/http"
@@ -67,6 +70,12 @@ func main() {
 	tasksService := tasks_service.NewTasksService(tasksRepository)
 	tasksTransportHTTP := tasks_transport_http.NewTasksHTTPHandler(tasksService)
 
+	//3. Начинаем выполнение фичи statistics
+	logger.Debug("Initializing feature", zap.String("feature", "statistics"))
+	statisticsRepository := statistics_postgres_repository.NewStatisticsRepository(pool)
+	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
+	statisticsTransportHTTP := statisctics_transport_http.NewStatisticsHTTPHandler(statisticsService)
+
 	//запускаем сервер
 	logger.Debug("initializing HTTP server")
 	httpServer := core_http_server.NewHTTPServer(
@@ -80,6 +89,7 @@ func main() {
 	apiVersionRouterV1 := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersionV1)
 	apiVersionRouterV1.RegisterRoutes(usersTransportHTTP.Routes()...)
 	apiVersionRouterV1.RegisterRoutes(tasksTransportHTTP.Routes()...)
+	apiVersionRouterV1.RegisterRoutes(statisticsTransportHTTP.Routes()...)
 
 	httpServer.RegisterAPIRouters(apiVersionRouterV1) //здесь по указателю внутрь передаем
 
