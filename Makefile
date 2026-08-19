@@ -75,3 +75,14 @@ todoapp-run:
 	export POSTGRES_HOST=localhost && \
 	go mod tidy && \
 	go run ${PROJECT_ROOT}/cmd/todoapp/main.go
+
+#--build для пересборки при каждом запуске
+todoapp-deploy:
+	@docker compose up -d --build todoapp
+
+todoapp-undeploy:
+	@docker compose down todoapp
+
+#чтобы обращаться к docker-compose не напрямую а через makefile сразу с .env
+ps:
+	@docker compose ps
