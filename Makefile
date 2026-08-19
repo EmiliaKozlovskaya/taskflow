@@ -80,6 +80,9 @@ todoapp-run:
 todoapp-deploy:
 	@docker compose up -d --build todoapp
 
+todoapp-undeploy:
+	@docker compose down todoapp
+
 #чтобы обращаться к docker-compose не напрямую а через makefile сразу с .env
 ps:
 	@docker compose ps
