@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Flow — Todo</title>
+    <style>
+        :root {
+            font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+            color: #edf6ff;
+            background: #0d1428
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            background: radial-gradient(circle at 5% 0, #243b7b 0, transparent 35rem), radial-gradient(circle at 95% 100%, #075b65 0, transparent 38rem), #0d1428
+        }
+
+        .app {
+            max-width: 1400px;
+            margin: auto;
+            padding: 28px clamp(16px, 4vw, 56px) 50px
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px
+        }
+
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: -.06em
+        }
+
+        .brand b {
+            display: inline-grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+            border-radius: 10px;
+            color: #092031;
+            background: #62e6c7
+        }
+
+        .online {
+            font-size: .85rem;
+            color: #b8c6dd
+        }
+
+        .online i {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 99px;
+            background: #62e6c7;
+            box-shadow: 0 0 0 4px #62e6c722
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr);
+            gap: 24px
+        }
+
+        .side,
+        .card {
+            border: 1px solid #ffffff1c;
+            background: #17233dcc;
+            box-shadow: 0 20px 55px #0004;
+            backdrop-filter: blur(16px)
+        }
+
+        .side {
+            align-self: start;
+            padding: 12px;
+            border-radius: 18px
+        }
+
+        .nav {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 10px;
+            color: #b6c4dd;
+            background: transparent;
+            text-align: left;
+            font-weight: 750
+        }
+
+        .nav:hover {
+            background: #ffffff0c;
+            color: #fff
+        }
+
+        .nav.active {
+            color: #082033;
+            background: #65e8f8
+        }
+
+        .view {
+            display: none
+        }
+
+        .view.active {
+            display: block;
+            animation: in .2s ease
+        }
+
+        .heading {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: clamp(1.7rem, 4vw, 2.4rem);
+            letter-spacing: -.06em
+        }
+
+        .muted {
+            margin: 0;
+            color: #aab9d2
+        }
+
+        .btn {
+            min-height: 40px;
+            padding: 0 14px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            color: #082033;
+            background: #65e8f8;
+            font-weight: 850;
+            cursor: pointer
+        }
+
+        .btn:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px)
+        }
+
+        .btn:disabled {
+            opacity: .6;
+            cursor: wait
+        }
+
+        .btn.alt {
+            color: #dbe8fc;
+            border-color: #ffffff28;
+            background: #ffffff0d
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px
+        }
+
+        .tabs {
+            display: flex;
+            padding: 4px;
+            border-radius: 11px;
+            background: #ffffff0d
+        }
+
+        .tab {
+            border: 0;
+            border-radius: 8px;
+            padding: 7px 10px;
+            color: #adbbd2;
+            background: transparent;
+            font-weight: 700
+        }
+
+        .tab.active {
+            color: #fff;
+            background: #ffffff19
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            border: 1px solid #ffffff23;
+            border-radius: 10px;
+            padding: 10px 11px;
+            outline: 0;
+            color: #edf6ff;
+            background: #ffffff0c;
+            font: inherit
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #65e8f8;
+            box-shadow: 0 0 0 3px #65e8f81c
+        }
+
+        option {
+            color: #17233d
+        }
+
+        .toolbar select {
+            width: auto;
+            min-width: 185px
+        }
+
+        .tasks,
+        .users {
+            display: grid;
+            gap: 10px
+        }
+
+        .task {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 13px;
+            padding: 16px;
+            border: 1px solid #ffffff18;
+            border-radius: 15px;
+            background: #172640b8
+        }
+
+        .task.done strong {
+            text-decoration: line-through;
+            color: #97a7c1
+        }
+
+        .check {
+            width: 23px;
+            height: 23px;
+            margin-top: 2px;
+            border: 2px solid #89a5c7;
+            border-radius: 50%;
+            color: #082033;
+            background: transparent;
+            font-weight: 900
+        }
+
+        .check.done {
+            border-color: #62e6c7;
+            background: #62e6c7
+        }
+
+        .task strong {
+            display: block;
+            margin-bottom: 5px
+        }
+
+        .desc {
+            margin: 0;
+            color: #aab9d2;
+            font-size: .88rem;
+            line-height: 1.45;
+            white-space: pre-wrap
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 11px;
+            color: #9faeca;
+            font-size: .75rem
+        }
+
+        .meta span {
+            padding: 4px 7px;
+            border-radius: 7px;
+            background: #ffffff0b
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px
+        }
+
+        .icon {
+            width: 31px;
+            height: 31px;
+            border: 1px solid #ffffff20;
+            border-radius: 8px;
+            color: #c7d4e9;
+            background: #ffffff0b;
+            cursor: pointer
+        }
+
+        .empty {
+            display: grid;
+            place-items: center;
+            min-height: 220px;
+            border: 1px dashed #ffffff31;
+            border-radius: 15px;
+            color: #aab9d2;
+            text-align: center;
+            padding: 20px
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            overflow: hidden;
+            border-radius: 16px
+        }
+
+        .metric {
+            padding: 20px;
+            border-right: 1px solid #ffffff1d
+        }
+
+        .metric:last-child {
+            border: 0
+        }
+
+        .metric small {
+            color: #aab9d2;
+            font-weight: 700
+        }
+
+        .metric b {
+            display: block;
+            margin-top: 7px;
+            font-size: 1.8rem;
+            letter-spacing: -.07em
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 10px;
+            margin-top: 20px
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid #ffffff18;
+            border-radius: 14px;
+            background: #172640b8
+        }
+
+        .avatar {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            color: #082033;
+            background: #65e8f8;
+            font-size: .8rem;
+            font-weight: 900
+        }
+
+        .user .info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .user strong {
+            display: block
+        }
+
+        .user small {
+            color: #aab9d2
+        }
+
+        dialog {
+            width: min(94vw, 510px);
+            padding: 0;
+            border: 1px solid #ffffff30;
+            border-radius: 17px;
+            color: #edf6ff;
+            background: #172640;
+            box-shadow: 0 25px 80px #000b
+        }
+
+        dialog::backdrop {
+            background: #050919aa;
+            backdrop-filter: blur(4px)
+        }
+
+        form {
+            padding: 24px
+        }
+
+        h2 {
+            margin: 0 0 5px
+        }
+
+        .field {
+            display: grid;
+            gap: 7px;
+            margin-top: 15px
+        }
+
+        label {
+            color: #bdcbe1;
+            font-size: .86rem;
+            font-weight: 700
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 22px
+        }
+
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            max-width: calc(100vw - 40px);
+            padding: 12px 15px;
+            border: 1px solid #ffffff2c;
+            border-radius: 10px;
+            color: #eaf7ff;
+            background: #1b2b48;
+            box-shadow: 0 12px 34px #0008;
+            transform: translateY(150%);
+            transition: .25s
+        }
+
+        .toast.show {
+            transform: none
+        }
+
+        .toast.error {
+            color: #fecdd3;
+            border-color: #fb718566
+        }
+
+        @keyframes in {
+            from {
+                opacity: 0;
+                transform: translateY(5px)
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @media(max-width:760px) {
+            .layout {
+                grid-template-columns: 1fr
+            }
+
+            .side {
+                display: flex;
+                gap: 5px;
+                overflow: auto
+            }
+
+            .nav {
+                white-space: nowrap;
+                width: auto
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .metric:nth-child(2) {
+                border: 0
+            }
+
+            .metric:nth-child(-n+2) {
+                border-bottom: 1px solid #ffffff1d
+            }
+        }
+
+        @media(max-width:520px) {
+            .heading {
+                display: grid
+            }
+
+            .heading .btn {
+                width: 100%
+            }
+
+            .toolbar {
+                display: grid;
+                grid-template-columns: 1fr 1fr
+            }
+
+            .toolbar select,
+            .tabs {
+                width: 100%;
+                grid-column: 1/-1
+            }
+
+            .filters {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .filters .btn {
+                grid-column: 1/-1
+            }
+
+            .task {
+                grid-template-columns: auto minmax(0, 1fr)
+            }
+
+            .actions {
+                grid-column: 2
+            }
+
+            .top {
+                margin-bottom: 18px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <header class="top">
+            <div class="brand"><b>✓</b>Flow</div>
+            <div class="online"><i></i> <span id="status">API подключён</span></div>
+        </header>
+        <div class="layout">
+            <aside class="side"><button class="nav active" data-view="tasks">☑ Задачи</button><button class="nav"
+                    data-view="stats">◔ Статистика</button><button class="nav" data-view="users">♙ Участники</button>
+            </aside>
+            <main>
+                <section class="view active" id="tasks">
+                    <div class="heading">
+                        <div>
+                            <h1>Задачи</h1>
+                            <p class="muted">Сфокусируйтесь на важном прямо сейчас.</p>
+                        </div><button class="btn" id="add-task">＋ Новая задача</button>
+                    </div>
+                    <div class="toolbar"><select id="task-user">
+                            <option value="">Все участники</option>
+                        </select>
+                        <div class="tabs"><button class="tab active" data-filter="all">Все</button><button class="tab"
+                                data-filter="active">В работе</button><button class="tab"
+                                data-filter="done">Готово</button></div><button class="btn alt" id="refresh-tasks">↻
+                            Обновить</button>
+                    </div>
+                    <div class="tasks" id="task-list"></div>
+                </section>
+                <section class="view" id="stats">
+                    <div class="heading">
+                        <div>
+                            <h1>Статистика</h1>
+                            <p class="muted">Прогресс команды за выбранный период.</p>
+                        </div>
+                    </div>
+                    <div class="stats card">
+                        <div class="metric"><small>СОЗДАНО</small><b id="created">—</b></div>
+                        <div class="metric"><small>ВЫПОЛНЕНО</small><b id="completed">—</b></div>
+                        <div class="metric"><small>ДОЛЯ ВЫПОЛНЕНИЯ</small><b id="rate">—</b></div>
+                        <div class="metric"><small>СРЕДНЕЕ ВРЕМЯ</small><b id="average">—</b></div>
+                    </div>
+                    <div class="filters"><select id="stat-user">
+                            <option value="">Все участники</option>
+                        </select><input id="from" type="date" aria-label="Начало периода"><input id="to" type="date"
+                            aria-label="Конец периода"><button class="btn" id="refresh-stats">Обновить</button></div>
+                </section>
+                <section class="view" id="users">
+                    <div class="heading">
+                        <div>
+                            <h1>Участники</h1>
+                            <p class="muted">Добавляйте коллег и назначайте им задачи.</p>
+                        </div><button class="btn" id="add-user">＋ Добавить</button>
+                    </div>
+                    <div class="users" id="user-list"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <dialog id="task-modal">
+        <form id="task-form">
+            <h2 id="task-title-modal">Новая задача</h2>
+            <p class="muted">Опишите результат и выберите исполнителя.</p><input id="edit-task-id" type="hidden">
+            <div class="field"><label for="title">Название</label><input id="title" maxlength="100" required></div>
+            <div class="field"><label for="description">Описание <span
+                        class="muted">(необязательно)</span></label><textarea id="description"
+                    maxlength="1000"></textarea></div>
+            <div class="field" id="author-field"><label for="author">Исполнитель</label><select id="author"
+                    required></select></div>
+            <div class="form-actions"><button type="button" class="btn alt"
+                    data-close="task-modal">Отмена</button><button class="btn">Сохранить</button></div>
+        </form>
+    </dialog>
+    <dialog id="user-modal">
+        <form id="user-form">
+            <h2 id="user-title-modal">Новый участник</h2>
+            <p class="muted">Он появится в списке исполнителей задач.</p><input id="edit-user-id" type="hidden">
+            <div class="field"><label for="name">Полное имя</label><input id="name" minlength="3" maxlength="100"
+                    required></div>
+            <div class="field"><label for="phone">Телефон <span class="muted">(необязательно)</span></label><input
+                    id="phone" minlength="10" maxlength="15" pattern="\+[0-9]+" placeholder="+79991234567"></div>
+            <div class="form-actions"><button type="button" class="btn alt"
+                    data-close="user-modal">Отмена</button><button class="btn">Сохранить</button></div>
+        </form>
+    </dialog>
+    <div class="toast" id="toast"></div>
+    <script>
+        const API = 'http://127.0.0.1:5050/api/v1', $ = s => document.querySelector(s), state = { users: [], tasks: [], filter: 'all' }; let timer;
+        const esc = v => String(v ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+        function toast(msg, err = false) { const t = $('#toast'); t.textContent = msg; t.className = 'toast show' + (err ? ' error' : ''); clearTimeout(timer); timer = setTimeout(() => t.className = 'toast', 3500) }
+        async function api(path, opt = {}) { try { const r = await fetch(API + path, { ...opt, headers: { 'Content-Type': 'application/json', ...(opt.headers || {}) } }); const d = (r.headers.get('content-type') || '').includes('json') ? await r.json() : null; if (!r.ok) throw Error(d?.message || d?.error || `Ошибка ${r.status}`); $('#status').textContent = 'API подключён'; return d } catch (e) { $('#status').textContent = 'Нет связи с API'; throw e } }
+        const uname = id => state.users.find(u => u.id === id)?.full_name || `Участник #${id}`; const date = v => v ? new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' }).format(new Date(v)) : '';
+        function selects() { const old = $('#task-user').value, oldS = $('#stat-user').value, opts = state.users.map(u => `<option value="${u.id}">${esc(u.full_name)}</option>`).join(''); $('#task-user').innerHTML = '<option value="">Все участники</option>' + opts; $('#stat-user').innerHTML = '<option value="">Все участники</option>' + opts; $('#author').innerHTML = opts || '<option value="">Сначала добавьте участника</option>'; $('#task-user').value = old; $('#stat-user').value = oldS }
+        function users() { const box = $('#user-list'); box.innerHTML = state.users.length ? state.users.map(u => `<article class="user"><div class="avatar">${esc(u.full_name.split(/\s+/).map(x => x[0]).slice(0, 2).join(''))}</div><div class="info"><strong>${esc(u.full_name)}</strong><small>${esc(u.phone_number || 'Телефон не указан')} · ID ${u.id}</small></div><div class="actions"><button class="icon" data-eu="${u.id}" title="Редактировать">✎</button><button class="icon" data-du="${u.id}" title="Удалить">×</button></div></article>`).join('') : '<div class="empty">В команде пока никого нет. Добавьте первого участника.</div>' }
+        function tasks() { const box = $('#task-list'), ts = state.tasks.filter(t => state.filter === 'all' || state.filter === 'done' ? state.filter === 'all' || t.completed : !t.completed); box.innerHTML = ts.length ? ts.map(t => `<article class="task ${t.completed ? 'done' : ''}"><button class="check ${t.completed ? 'done' : ''}" data-toggle="${t.id}" title="Изменить статус">${t.completed ? '✓' : ''}</button><div><strong>${esc(t.title)}</strong>${t.description ? `<p class="desc">${esc(t.description)}</p>` : ''}<div class="meta"><span>♙ ${esc(uname(t.author_user_id))}</span><span>Создано ${date(t.created_at)}</span>${t.completed_at ? `<span>Готово ${date(t.completed_at)}</span>` : ''}</div></div><div class="actions"><button class="icon" data-et="${t.id}" title="Редактировать">✎</button><button class="icon" data-dt="${t.id}" title="Удалить">×</button></div></article>`).join('') : `<div class="empty">${state.users.length ? 'Здесь пока нет задач. Создайте первую.' : 'Сначала добавьте участника команды.'}</div>` }
+        async function loadUsers() { state.users = await api('/users'); users(); selects() } async function loadTasks() { const id = $('#task-user').value; state.tasks = await api('/tasks' + (id ? '?user_id=' + id : '')); tasks() } async function loadStats() { const p = new URLSearchParams(); if ($('#stat-user').value) p.set('user_id', $('#stat-user').value); if ($('#from').value) p.set('from', $('#from').value); if ($('#to').value) p.set('to', $('#to').value); const s = await api('/statistics' + (p.size ? '?' + p : '')); $('#created').textContent = s.tasks_created ?? 0; $('#completed').textContent = s.tasks_completed ?? 0; $('#rate').textContent = s.tasks_completed_rate == null ? '—' : Math.round(s.tasks_completed_rate) + '%'; $('#average').textContent = s.tasks_average_completion_time || '—' }
+        async function reload() { try { await loadUsers(); await Promise.all([loadTasks(), loadStats()]) } catch (e) { toast(e.message, true); users(); tasks() } }
+        function taskModal(t) { if (!state.users.length) return toast('Сначала добавьте участника.', true); $('#task-form').reset(); $('#edit-task-id').value = t?.id || ''; $('#task-title-modal').textContent = t ? 'Редактировать задачу' : 'Новая задача'; $('#title').value = t?.title || ''; $('#description').value = t?.description || ''; $('#author-field').hidden = !!t; if (!t) $('#author').value = state.users[0].id; $('#task-modal').showModal() } function userModal(u) { $('#user-form').reset(); $('#edit-user-id').value = u?.id || ''; $('#user-title-modal').textContent = u ? 'Редактировать участника' : 'Новый участник'; $('#name').value = u?.full_name || ''; $('#phone').value = u?.phone_number || ''; $('#user-modal').showModal() }
+        document.querySelectorAll('.nav').forEach(b => b.onclick = async () => { document.querySelectorAll('.nav').forEach(x => x.classList.toggle('active', x === b)); document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id === b.dataset.view)); if (b.dataset.view === 'stats') try { await loadStats() } catch (e) { toast(e.message, true) } }); document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => $('#' + b.dataset.close).close()); $('#add-task').onclick = () => taskModal(); $('#add-user').onclick = () => userModal(); $('#task-user').onchange = () => loadTasks().catch(e => toast(e.message, true)); $('#refresh-tasks').onclick = () => loadTasks().catch(e => toast(e.message, true)); $('#refresh-stats').onclick = () => loadStats().catch(e => toast(e.message, true)); document.querySelectorAll('.tab').forEach(b => b.onclick = () => { state.filter = b.dataset.filter; document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === b)); tasks() });
+        $('#task-form').onsubmit = async e => { e.preventDefault(); const id = $('#edit-task-id').value, p = { title: $('#title').value.trim(), description: $('#description').value.trim() || null }; if (!id) p.author_user_id = Number($('#author').value); try { await api(id ? '/tasks/' + id : '/tasks', { method: id ? 'PATCH' : 'POST', body: JSON.stringify(p) }); $('#task-modal').close(); await Promise.all([loadTasks(), loadStats()]); toast(id ? 'Задача обновлена' : 'Задача создана') } catch (x) { toast(x.message, true) } };
+        $('#user-form').onsubmit = async e => { e.preventDefault(); const id = $('#edit-user-id').value, p = { full_name: $('#name').value.trim() }, phone = $('#phone').value.trim(); if (phone || id) p.phone_number = phone || null; try { await api(id ? '/users/' + id : '/users', { method: id ? 'PATCH' : 'POST', body: JSON.stringify(p) }); $('#user-modal').close(); await reload(); toast(id ? 'Участник обновлён' : 'Участник добавлен') } catch (x) { toast(x.message, true) } };
+        $('#task-list').onclick = async e => { const b = e.target.closest('button'); if (!b) return; const id = Number(b.dataset.toggle || b.dataset.et || b.dataset.dt), t = state.tasks.find(x => x.id === id); if (!t) return; if (b.dataset.et) return taskModal(t); try { if (b.dataset.dt) { if (!confirm(`Удалить задачу «${t.title}»?`)) return; await api('/tasks/' + id, { method: 'DELETE' }); toast('Задача удалена') } else await api('/tasks/' + id, { method: 'PATCH', body: JSON.stringify({ completed: !t.completed }) }); await Promise.all([loadTasks(), loadStats()]) } catch (x) { toast(x.message, true) } };
+        $('#user-list').onclick = async e => { const b = e.target.closest('button'); if (!b) return; const id = Number(b.dataset.eu || b.dataset.du), u = state.users.find(x => x.id === id); if (!u) return; if (b.dataset.eu) return userModal(u); if (!confirm(`Удалить участника «${u.full_name}»?`)) return; try { await api('/users/' + id, { method: 'DELETE' }); await reload(); toast('Участник удалён') } catch (x) { toast(x.message, true) } }; reload();
+    </script>
+</body>
+
+</html>

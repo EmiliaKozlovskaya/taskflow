@@ -22,6 +22,9 @@ import (
 	users_postgres_repository "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/users/repository/postgres"
 	users_service "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/users/service"
 	users_transport_http "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/users/transport/http"
+	web_fs_repository "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/web/repository/file_system"
+	web_service "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/web/service"
+	web_transport_http "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/web/transport/http"
 	"go.uber.org/zap"
 
 	_ "github.com/EmiliaKozlovskaya/golang-todoapp/docs"
@@ -83,6 +86,11 @@ func main() {
 	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
 	statisticsTransportHTTP := statisctics_transport_http.NewStatisticsHTTPHandler(statisticsService)
 
+	logger.Debug("Initializing feature", zap.String("feature", "web"))
+	webRepository := web_fs_repository.NewWebRepository()
+	webService := web_service.NewWebService(webRepository)
+	webTransportHTTP := web_transport_http.NewWebHTTPHandler(webService)
+
 	//запускаем сервер
 	logger.Debug("initializing HTTP server")
 	httpServer := core_http_server.NewHTTPServer(
@@ -98,8 +106,14 @@ func main() {
 	apiVersionRouterV1.RegisterRoutes(usersTransportHTTP.Routes()...)
 	apiVersionRouterV1.RegisterRoutes(tasksTransportHTTP.Routes()...)
 	apiVersionRouterV1.RegisterRoutes(statisticsTransportHTTP.Routes()...)
+	/*  Если напишем так
+	apiVersionRouterV1.RegisterRoutes(webTransportHTTP.Routes()...)
+		то будет путь todoapp.ru/api/v1
+		поэтому зарегистрирууем напрямую в сервере без посредника apiVersionRouter
+	*/
 
 	httpServer.RegisterAPIRouters(apiVersionRouterV1) //здесь по указателю внутрь передаем
+	httpServer.RegisterRoutes(webTransportHTTP.Routes()...)
 	httpServer.RegisterSwagger()
 
 	if err := httpServer.Run(ctx); err != nil {

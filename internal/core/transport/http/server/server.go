@@ -46,6 +46,14 @@ func (s *HTTPServer) RegisterAPIRouters(routers ...*APIVersionRouter) { //ука
 	}
 }
 
+func (s *HTTPServer) RegisterRoutes(routes ...Route) {
+	for _, route := range routes {
+		pattern := fmt.Sprintf("%s %s", route.Method, route.Path) //формируем паттерн для маршрута, который будет включать метод и путь (например, "GET /users", "POST /users/{id}/tasks" и т.д.)
+
+		s.mux.Handle(pattern, route.WithMiddleware()) //регистрируем маршрут в ServeMux с помощью метода Handle, который принимает паттерн и хэндлер
+	}
+}
+
 // Это в целом стоит запомнить просто как правило регистрации сваггера
 func (s *HTTPServer) RegisterSwagger() {
 	s.mux.Handle(
