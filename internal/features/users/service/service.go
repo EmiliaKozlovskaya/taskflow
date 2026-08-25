@@ -3,7 +3,7 @@ package users_service
 import (
 	"context"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
 )
 
 type UsersService struct { //должен имплементировать интерфейс UsersService из trancport.go, поэтому создаем service/create_user.go

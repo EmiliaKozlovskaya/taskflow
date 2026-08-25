@@ -3,7 +3,7 @@ package core_http_types
 import (
 	"encoding/json"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
 )
 
 // создаем еще одну структуру Nullable которая встраивает в себя Nullable из пакета домена,

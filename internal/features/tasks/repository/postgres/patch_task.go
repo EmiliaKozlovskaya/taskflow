@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
-	core_errors "github.com/Emilia20112005/golang-todoapp/internal/core/errors"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
+	core_errors "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/errors"
 	"github.com/jackc/pgx/v5"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
 )
 
 type StatisticsService struct {

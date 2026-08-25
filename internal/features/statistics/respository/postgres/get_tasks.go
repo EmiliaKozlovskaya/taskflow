@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
 )
 
 func (r *StatisticsRepository) GetTasks(

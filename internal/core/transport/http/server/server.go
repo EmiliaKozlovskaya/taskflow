@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"net/http"
 
-	core_logger "github.com/Emilia20112005/golang-todoapp/internal/core/logger"
-	core_http_middleware "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/middleware"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/docs"
+	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
+	core_http_middleware "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"go.uber.org/zap"
 )
 
@@ -42,6 +44,25 @@ func (s *HTTPServer) RegisterAPIRouters(routers ...*APIVersionRouter) { //ука
 			http.StripPrefix(prefix, router.WithMidlleware()), //тут можем использовать router в качестве http.Handler потому что APIVersionRouter удовлетворяет интерфейсу Handler
 		)
 	}
+}
+
+// Это в целом стоит запомнить просто как правило регистрации сваггера
+func (s *HTTPServer) RegisterSwagger() {
+	s.mux.Handle(
+		"/swagger/",
+		httpSwagger.Handler(
+			httpSwagger.URL("/swagger/doc.json"),
+		),
+	)
+
+	s.mux.HandleFunc(
+		"/swagger/doc.json",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(docs.SwaggerInfo.ReadDoc()))
+		},
+	)
 }
 
 func (s *HTTPServer) Run(ctx context.Context) error {

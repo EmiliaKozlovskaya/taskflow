@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	core_errors "github.com/Emilia20112005/golang-todoapp/internal/core/errors"
+	core_errors "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/errors"
 )
 
 func (r *TasksRepository) DeleteTask(

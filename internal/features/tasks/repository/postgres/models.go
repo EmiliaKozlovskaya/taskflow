@@ -3,7 +3,7 @@ package tasks_postgres_repository
 import (
 	"time"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
 )
 
 type TaskModel struct {

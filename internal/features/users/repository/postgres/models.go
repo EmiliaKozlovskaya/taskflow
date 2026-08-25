@@ -1,6 +1,6 @@
 package users_postgres_repository
 
-import "github.com/Emilia20112005/golang-todoapp/internal/core/domain"
+import "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
 
 // в данном случае все поля будут дублировать поля доменной сущности
 type UserModel struct {

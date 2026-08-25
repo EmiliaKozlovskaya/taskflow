@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
-	core_http_server "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/server"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
+	core_http_server "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/server"
 )
 
 type StatisticsHTTPHandler struct {

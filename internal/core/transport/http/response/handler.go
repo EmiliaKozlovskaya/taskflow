@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"net/http"
 
-	core_errors "github.com/Emilia20112005/golang-todoapp/internal/core/errors"
-	core_logger "github.com/Emilia20112005/golang-todoapp/internal/core/logger"
+	core_errors "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/errors"
+	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
 	"go.uber.org/zap"
 )
 
@@ -86,11 +86,9 @@ func (h *HTTPResponder) errorResponse(
 	err error,
 	msg string,
 ) {
-
-	//возвращаем клиенту http ответ с кодом 500 и json сообщением об ошибке
-	response := map[string]string{
-		"message": msg,
-		"error":   err.Error(), //метод Error() возвращает строковое представление ошибки
+	response := ErrorResponse{
+		Error:   err.Error(),
+		Message: msg,
 	}
 	h.JSONResponse(rw, response, statusCode) //т.е это обычный json response но с особым response body с ошибкой
 
