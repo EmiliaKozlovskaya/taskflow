@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	core_http_middleware "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/middleware"
+	core_http_middleware "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/middleware"
 )
 
 type ApiVersion string //alias для типа string, чтобы использовать его как тип для версий API (например, "v1", "v2" и т.д.)

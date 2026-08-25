@@ -1,6 +1,6 @@
 package users_postgres_repository
 
-import core_postgres_pool "github.com/Emilia20112005/golang-todoapp/internal/core/repository/postgres/pool"
+import core_postgres_pool "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/repository/postgres/pool"
 
 type UsersRepository struct {
 	//мы не хотим тут напрямую зависеть от подключения pgx.Conn, потому что при тестировании это значит

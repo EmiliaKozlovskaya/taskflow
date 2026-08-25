@@ -1,6 +1,6 @@
 package tasks_postgres_repository
 
-import core_postgres_pool "github.com/Emilia20112005/golang-todoapp/internal/core/repository/postgres/pool"
+import core_postgres_pool "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/repository/postgres/pool"
 
 type TasksRepository struct {
 	pool core_postgres_pool.Pool

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	core_errors "github.com/Emilia20112005/golang-todoapp/internal/core/errors"
+	core_errors "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/errors"
 )
 
 //query parameters будут двух видов (для get_users limit & offset) и (для get_statistics дата from & to)

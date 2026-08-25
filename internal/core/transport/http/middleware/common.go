@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	core_logger "github.com/Emilia20112005/golang-todoapp/internal/core/logger"
-	core_http_response "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/response"
+	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
+	core_http_response "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/response"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -14,6 +14,33 @@ import (
 const requestIDHeader = "X-Request-ID"
 
 // зачастую middleware это функция, которая оборачивает обработку http запроса, то есть добавляет дополнительную функциональность к существующему обработчику.
+
+func CORS() Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			//тут создадим множество Origins, которым мы доверяем
+			//В отличие от массива (поиск эл-та O(n)) поиск эл-та в мн-ве O(1)
+			allowedOrigins := map[string]struct{}{ //таким образом можем реализовать структуру данных множество - неупорядоченный набор УНИКАЛЬНЫХ значений
+				"http://localhost:5050": {},
+			}
+
+			origin := r.Header.Get("Origin")
+
+			if _, ok := allowedOrigins[origin]; ok {
+				w.Header().Set("Access-Control-Allow-Origin", origin)                               // если Origin в списке разрешенных, то добавляем его в заголовки ответа
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS") //какие методы разрешены в запросе
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")       //какие заголовки разрешены в запросе
+			}
+
+			if r.Method == http.MethodOptions {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
 
 // middleware для генерации request_id
 func RequestID() Middleware { //чтобы вернуть Middleware, нужно вернуть функцию, соответствующую сигнатуре Middleware(из файла middleware.go), которая принимает http.Handler и возвращает http.Handler

@@ -3,24 +3,34 @@ package users_transport_http
 import (
 	"net/http"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
-	core_logger "github.com/Emilia20112005/golang-todoapp/internal/core/logger"
-	core_http_request "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/request"
-	core_http_response "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/response"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
+	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
+	core_http_request "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/request"
+	core_http_response "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/response"
 )
 
 // DTO нужны для http запросов и ответов. Request - что приходит от клиента, Response - что отправляем клиенту.
 // объявляем только поля которые будем использовать
 type CreateUserRequest struct {
 	//id не нужен(сами нагенерим), version не нужен(по умолчанию 1)
-	FullName    string  `json:"full_name"    validate:"required,min=3,max=100"` //сразу валидируем
-	PhoneNumber *string `json:"phone_number" validate:"omitempty,min=10,max=15,startswith=+"`
+	FullName    string  `json:"full_name"    validate:"required,min=3,max=100"                example:"Ivan Ivanov"` //сразу валидируем
+	PhoneNumber *string `json:"phone_number" validate:"omitempty,min=10,max=15,startswith=+"  example:"+7999887766"` //examples оставляем для красивой документации в swagger
 }
 
 // делаем type alias на общий вид http response
 type CreateUserResponse UserDTOResponse
 
-// метод для обработки http запроса на создание пользователя.
+// CreateUser   godoc
+// @Summary     Создать пользователя
+// @Description Метод для обработки http запроса на создание нового пользователя в системе.
+// @Tags        users
+// @Accept      json
+// @Produce     json
+// @Param       request body CreateUserRequest true "CreateUser тело запроса (обязательный формат входящей ДТО)"
+// @Success     201 {object} CreateUserResponse "Успешно созданный пользователь возвращается в данном ответном ДТО"
+// @Failure     400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure     500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Router      /users [post]
 func (h *UsersHTTPHandler) CreateUser(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)

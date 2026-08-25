@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
-	core_logger "github.com/Emilia20112005/golang-todoapp/internal/core/logger"
-	core_http_request "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/request"
-	core_http_response "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/response"
-	core_http_types "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/types"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
+	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
+	core_http_request "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/request"
+	core_http_response "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/response"
+	core_http_types "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/types"
 )
 
 type PatchTaskRequest struct {
 	//по бизнес-правилам должны уметь менять заголовок/описание/completed
-	Title       core_http_types.Nullable[string] `json:"title"`
-	Description core_http_types.Nullable[string] `json:"description"`
-	Completed   core_http_types.Nullable[bool]   `json:"completed"`
+	Title       core_http_types.Nullable[string] `json:"title"        swaggertype:"string" example:"Сделать домашку"`
+	Description core_http_types.Nullable[string] `json:"description"  swaggertype:"string" example:"Сделать до четверга"`
+	Completed   core_http_types.Nullable[bool]   `json:"completed"    swaggertype:"boolean"`
 }
 
 // чтобы функция DecodeAndValidate применила наши кастомные правила валидации
@@ -49,6 +49,25 @@ func (r *PatchTaskRequest) Validate() error {
 
 type PatchTaskResponse TaskDTOResponse
 
+// PatchTask    godoc
+// @Summary     Изменение задачи
+// @Description Изменение информации об уже существующей в системе задачи
+// @Description ### Логика обновления полей (Three-state logic):
+// @Description 1. **Поле не передано**: `description` игнорируется, значение в БД не меняется
+// @Description 2. **Явно передано значение**: `"description":"Сделать до четверга"` - устанавливает новое описание в БД
+// @Description 3. **Явно передано значение null**: `"description": null` - очищает поле в БД (set to NULL)
+// @Description Ограничения: `title` и `completed` не может быть выставлен как null
+// @Tags        tasks
+// @Accept      json
+// @Produce     json
+// @Param       id      path      int             true 		       "ID изменяемой задачи"
+// @Param       request body     PatchTaskRequest true             "PatchTask тело запроса"
+// @Success     200     {object} PatchTaskResponse                 "Задача успешно изменена"
+// @Failure     400     {object} core_http_response.ErrorResponse  "Bad Request"
+// @Failure     404     {object} core_http_response.ErrorResponse  "Task Not Found"
+// @Failure     409     {object} core_http_response.ErrorResponse  "Conflict"
+// @Failure     500     {object} core_http_response.ErrorResponse  "Internal Server error"
+// @Router      /tasks/{id} [patch]
 func (h *TasksHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)

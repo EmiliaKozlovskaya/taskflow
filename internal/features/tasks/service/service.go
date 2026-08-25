@@ -3,7 +3,7 @@ package tasks_service
 import (
 	"context"
 
-	"github.com/Emilia20112005/golang-todoapp/internal/core/domain"
+	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
 )
 
 type TasksService struct {

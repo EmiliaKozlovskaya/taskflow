@@ -4,13 +4,24 @@ import (
 	"fmt"
 	"net/http"
 
-	core_logger "github.com/Emilia20112005/golang-todoapp/internal/core/logger"
-	core_http_request "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/request"
-	core_http_response "github.com/Emilia20112005/golang-todoapp/internal/core/transport/http/response"
+	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
+	core_http_request "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/request"
+	core_http_response "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/response"
 )
 
 type GetUsersResponse []UserDTOResponse
 
+// GetUsers     godoc
+// @Summary     Получение всех пользователей
+// @Description Получение всех существующих пользователей в системе c опциональной пагинацией
+// @Tags        users
+// @Produce     json
+// @Param       limit query int false                         "Размер страницы с пользователями"
+// @Param       offset query int false                        "Смещение страницы с пользователями"
+// @Success     200 {object} GetUsersResponse                 "Пользователи успешно получены"
+// @Failure     400 {object} core_http_response.ErrorResponse "Bad Request"
+// @Failure     500 {object} core_http_response.ErrorResponse "Internal Server error"
+// @Router      /users [get]
 func (h *UsersHTTPHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)

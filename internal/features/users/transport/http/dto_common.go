@@ -1,13 +1,13 @@
 package users_transport_http
 
-import "github.com/Emilia20112005/golang-todoapp/internal/core/domain"
+import "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
 
 // Инфа о созданном ресурсе (вынесли в отдельный файл так как юзаем и в create_users, и get_users и get_user )
 type UserDTOResponse struct {
-	ID          int     `json:"id"`
-	Version     int     `json:"version"`
-	FullName    string  `json:"full_name"`
-	PhoneNumber *string `json:"phone_number"`
+	ID          int     `json:"id"             example:"10"`
+	Version     int     `json:"version"        example:"3"`
+	FullName    string  `json:"full_name"      example:"Ivan Ivanov"`
+	PhoneNumber *string `json:"phone_number"   example:"+79998887766"`
 }
 
 // dtoFromDomain — это переводчик «изнутри наружу».
