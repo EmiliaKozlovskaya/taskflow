@@ -93,3 +93,12 @@ func (h *HTTPResponder) errorResponse(
 	h.JSONResponse(rw, response, statusCode) //т.е это обычный json response но с особым response body с ошибкой
 
 }
+
+func (h *HTTPResponder) HTMLResponse(rw http.ResponseWriter, html []byte) {
+	rw.WriteHeader(http.StatusOK)
+
+	rw.Header().Set("Content-Type", "text/html; charset=utf-8") //чтобы браузер понимал что это html, а не json
+	if _, err := rw.Write(html); err != nil {
+		h.log.Error("write HTML HTTP response", zap.Error(err))
+	}
+}

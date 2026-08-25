@@ -19,4 +19,7 @@ FROM alpine:3.24
 WORKDIR /app
 #нужно указать с какого stage хотим копировать
 COPY --from=builder /app/cmd/todoapp/exe /app
+COPY --from=builder /app/public /app/public
+#для service.GetMainPage нужен project_root
+ENV PROJECT_ROOT=/app
 CMD ["/app/exe"]

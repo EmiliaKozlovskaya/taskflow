@@ -22,6 +22,7 @@ func CORS() Middleware {
 			//В отличие от массива (поиск эл-та O(n)) поиск эл-та в мн-ве O(1)
 			allowedOrigins := map[string]struct{}{ //таким образом можем реализовать структуру данных множество - неупорядоченный набор УНИКАЛЬНЫХ значений
 				"http://localhost:5050": {},
+				"null":                  {},
 			}
 
 			origin := r.Header.Get("Origin")
