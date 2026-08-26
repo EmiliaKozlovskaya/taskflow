@@ -7,9 +7,11 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+// config нужен для того, чтобы хранить конфигурацию сервера, которую мы будем получать из переменных окружения
 type Config struct {
-	Addr            string        `envconfig:"ADDR" required:"true"`           //адрес, на котором будет слушать сервер, например ":8080"
-	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"` //таймаут на завершение работы сервера, чтобы корректно завершить все текущие запросы и закрыть соединения
+	Addr            string        `envconfig:"ADDR" required:"true"`            //адрес, на котором будет слушать сервер, например ":8080"
+	ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`  //таймаут на завершение работы сервера, чтобы корректно завершить все текущие запросы и закрыть соединения
+	AllowedOrigins  []string      `envconfig:"ALLOWED_ORIGINS" required:"true"` //выносим allowed origins для cors в переменные окружения для безопасности
 }
 
 func NewConfig() (Config, error) {

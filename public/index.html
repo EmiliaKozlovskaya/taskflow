@@ -621,7 +621,7 @@
     </dialog>
     <div class="toast" id="toast"></div>
     <script>
-        const API = 'http://127.0.0.1:5050/api/v1', $ = s => document.querySelector(s), state = { users: [], tasks: [], filter: 'all' }; let timer;
+        const API = '/api/v1', $ = s => document.querySelector(s), state = { users: [], tasks: [], filter: 'all' }; let timer;
         const esc = v => String(v ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
         function toast(msg, err = false) { const t = $('#toast'); t.textContent = msg; t.className = 'toast show' + (err ? ' error' : ''); clearTimeout(timer); timer = setTimeout(() => t.className = 'toast', 3500) }
         async function api(path, opt = {}) { try { const r = await fetch(API + path, { ...opt, headers: { 'Content-Type': 'application/json', ...(opt.headers || {}) } }); const d = (r.headers.get('content-type') || '').includes('json') ? await r.json() : null; if (!r.ok) throw Error(d?.message || d?.error || `Ошибка ${r.status}`); $('#status').textContent = 'API подключён'; return d } catch (e) { $('#status').textContent = 'Нет связи с API'; throw e } }

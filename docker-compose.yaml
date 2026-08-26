@@ -7,8 +7,11 @@ services:
     container_name: todoapp
     environment:
       # из .env
+      # внутри контейнера мы можем использовать переменные окружения, которые мы передали в docker-compose.yaml
+      # докер контейнер не имеет доступа к переменным окружения локальной машины, поэтому мы должны явно передавать их в контейнер через docker-compose.yaml
       - HTTP_ADDR=:5050
       - HTTP_SHUTDOWN_TIMEOUT=${HTTP_SHUTDOWN_TIMEOUT}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}

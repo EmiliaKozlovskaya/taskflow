@@ -15,16 +15,16 @@ const requestIDHeader = "X-Request-ID"
 
 // зачастую middleware это функция, которая оборачивает обработку http запроса, то есть добавляет дополнительную функциональность к существующему обработчику.
 
-func CORS() Middleware {
+func CORS(allowedOriginsList []string) Middleware {
+	allowedOrigins := make(map[string]struct{})
+	for _, origin := range allowedOriginsList {
+		allowedOrigins[origin] = struct{}{} //это позволяет нам быстро проверять, разрешен ли данный origin, без необходимости перебирать массив каждый раз (поиск в множестве O(1), а в массиве O(n))
+		// struct{}{} - это пустая структура, которая занимает 0 байт памяти, поэтому мы используем ее в качестве значения в множестве, чтобы не тратить лишнюю память.
+
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			//тут создадим множество Origins, которым мы доверяем
-			//В отличие от массива (поиск эл-та O(n)) поиск эл-та в мн-ве O(1)
-			allowedOrigins := map[string]struct{}{ //таким образом можем реализовать структуру данных множество - неупорядоченный набор УНИКАЛЬНЫХ значений
-				"http://localhost:5050": {},
-				"null":                  {},
-			}
-
 			origin := r.Header.Get("Origin")
 
 			if _, ok := allowedOrigins[origin]; ok {
