@@ -11,9 +11,11 @@ import (
 	core_config "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/config"
 	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
 	core_postgres_pool "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/repository/postgres/pool"
+	core_redis "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/repository/redis"
 	core_http_middleware "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/middleware"
 	core_http_server "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/server"
 	statistics_postgres_repository "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/statistics/respository/postgres"
+	statistics_redis_repository "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/statistics/respository/redis"
 	statistics_service "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/statistics/service"
 	statisctics_transport_http "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/statistics/transport/http"
 	tasks_postgres_repository "github.com/EmiliaKozlovskaya/golang-todoapp/internal/features/tasks/repository/postgres"
@@ -65,6 +67,17 @@ func main() {
 	}
 	defer pool.Close()
 
+	//подключаем клиент Redis
+	logger.Debug("Initializing Redis client")
+	client, err := core_redis.NewClient(
+		ctx,
+		core_redis.NewConfigMust(),
+	)
+	if err != nil {
+		logger.Fatal("failed to init redis client", zap.Error(err))
+	}
+	defer client.Close()
+
 	//1. Начинаем выполнение фичи юзерс
 	logger.Debug("Initializing feature", zap.String("feature", "users")) //указываем что начинаем выполнение фичи юзерс
 	//репозиторий
@@ -83,7 +96,8 @@ func main() {
 	//3. Начинаем выполнение фичи statistics
 	logger.Debug("Initializing feature", zap.String("feature", "statistics"))
 	statisticsRepository := statistics_postgres_repository.NewStatisticsRepository(pool)
-	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
+	statisticsRedisRepository := statistics_redis_repository.NewStatisticsRepository(client)
+	statisticsService := statistics_service.NewStatisticsService(statisticsRepository, statisticsRedisRepository)
 	statisticsTransportHTTP := statisctics_transport_http.NewStatisticsHTTPHandler(statisticsService)
 
 	logger.Debug("Initializing feature", zap.String("feature", "web"))
