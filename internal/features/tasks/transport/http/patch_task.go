@@ -3,12 +3,15 @@ package tasks_transport_http
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
+	core_kafka "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/kafka"
 	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
 	core_http_request "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/request"
 	core_http_response "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/response"
 	core_http_types "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/types"
+	"go.uber.org/zap"
 )
 
 type PatchTaskRequest struct {
@@ -72,6 +75,8 @@ func (h *TasksHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponder(log)
+	//для отправки в Kafka
+	requestedAt := time.Now().UTC()
 
 	taskID, err := core_http_request.GetIntPathValue(r, "id")
 	if err != nil {
@@ -101,6 +106,12 @@ func (h *TasksHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 			"failed to patch task",
 		)
 		return
+	}
+
+	event := core_kafka.NewTaskEvent(requestedAt, core_kafka.TaskUpdated)
+
+	if err := h.publisher.Publish(ctx, event); err != nil {
+		log.Warn("failed to publish task event", zap.Error(err))
 	}
 
 	response := PatchTaskResponse(taskDTOFromDomain(taskDomain))

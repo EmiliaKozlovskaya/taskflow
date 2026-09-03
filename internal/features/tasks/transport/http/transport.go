@@ -5,12 +5,13 @@ import (
 	"net/http"
 
 	"github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/domain"
+	core_kafka "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/kafka"
 	core_http_server "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/server"
 )
 
 type TasksHTTPHandler struct {
-	tasksService TasksService //текущий уровень зависит от интерфейса уровня сервиса
-
+	tasksService TasksService                  //текущий уровень зависит от интерфейса уровня сервиса
+	publisher    core_kafka.TaskEventPublisher //текущий уровень зависит от интерфейса уровня сервиса, чтобы публиковать события в Kafka
 }
 
 type TasksService interface {
@@ -41,9 +42,11 @@ type TasksService interface {
 
 func NewTasksHTTPHandler(
 	tasksService TasksService,
+	publisher core_kafka.TaskEventPublisher, //передаем publisher, чтобы сервис мог публиковать события в Kafka
 ) *TasksHTTPHandler {
 	return &TasksHTTPHandler{
 		tasksService: tasksService,
+		publisher:    publisher,
 	}
 }
 
