@@ -1,4 +1,4 @@
-# Todo App
+# TaskFlow
 
 REST API для управления задачами и пользователями на Go. Проект построен вокруг PostgreSQL, Redis и Kafka: PostgreSQL хранит основные данные, Redis кэширует статистику, а Kafka worker записывает пользовательские события в лог.
 
