@@ -91,6 +91,42 @@ swagger-gen:
 		--parseInternal \
 		--parseDependency
 
+
+kafka-up:
+	@docker compose up -d kafka
+
+kafka-down:
+	@docker compose stop kafka
+
+
+kafka-worker-up:
+	@docker compose up -d --build kafka-worker
+
+kafka-worker-down:
+	@docker compose stop kafka-worker
+
+# логи кафки, чтобы видеть что происходит в брокере, -f - следить за логами в реальном времени
+kafka-logs:
+	@docker compose logs -f kafka
+
+# replication-factor 1 - так как у нас один брокер, то и репликация будет только на одном брокере
+# partitions 1 потому что консьюмер только один это наш kafka-service
+kafka-topic-create:
+	@docker compose exec kafka \
+		/opt/kafka/bin/kafka-topics.sh \
+		--bootstrap-server kafka:9092 \
+		--create \
+		--if-not-exists \
+		--topic todo.task-events \
+		--partitions 1 \
+		--replication-factor 1 
+
+kafka-topic-list:
+	@docker compose exec kafka \
+		/opt/kafka/bin/kafka-topics.sh \
+		--bootstrap-server kafka:9092 \
+		--list
+
 #чтобы обращаться к docker-compose не напрямую а через makefile сразу с .env
 ps:
 	@docker compose ps
