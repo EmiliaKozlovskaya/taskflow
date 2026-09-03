@@ -1,19 +1,21 @@
 # TaskFlow
 
-REST API для управления задачами и пользователями на Go. Проект построен вокруг PostgreSQL, Redis и Kafka: PostgreSQL хранит основные данные, Redis кэширует статистику, а Kafka worker записывает пользовательские события в лог.
+Backend-сервис для управления задачами и пользователями, разработанный на Go.
+Проект представляет собой REST API с PostgreSQL, Redis и Apache Kafka. PostgreSQL используется для хранения основных данных, Redis — для кеширования статистики, а Kafka — для асинхронной обработки событий пользовательских действий.
 
-## Возможности
+## Key features
 
-- CRUD для пользователей и задач
-- конкурентная обработка HTTP-запросов через `net/http`
-- оптимистическая блокировка записей по полю `version`
-- статистика по задачам с опциональной фильтрацией
-- кэш статистики в Redis
-- публикация событий действий пользователя в Kafka
-- отдельный Kafka worker для чтения и логирования событий
-- миграции PostgreSQL
-- Swagger UI и OpenAPI-описание API
-- graceful shutdown по `SIGINT` и `SIGTERM`
+* REST API для управления пользователями и задачами
+* Конкурентная обработка HTTP-запросов
+* Optimistic locking для защиты от конфликтов при обновлении данных
+* PostgreSQL для хранения данных
+* Redis caching для статистики
+* Event-driven взаимодействие через Apache Kafka
+* Отдельный Kafka consumer/worker для обработки событий
+* SQL migrations
+* Swagger / OpenAPI documentation
+* Docker Compose для локального окружения
+* Graceful shutdown по SIGINT и SIGTERM
 
 ## Архитектура
 
