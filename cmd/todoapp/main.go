@@ -9,6 +9,7 @@ import (
 	"time"
 
 	core_config "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/config"
+	core_kafka "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/kafka"
 	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
 	core_postgres_pool "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/repository/postgres/pool"
 	core_redis "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/repository/redis"
@@ -67,6 +68,20 @@ func main() {
 	}
 	defer pool.Close()
 
+	//Kafka init
+	kafkaConfig := core_kafka.NewConfigMust()
+
+	var publisher core_kafka.TaskEventPublisher
+
+	if kafkaConfig.Enabled {
+		publisher = core_kafka.NewKafkaPublisher(kafkaConfig)
+		logger.Info("Kafka event publishing enabled")
+	} else {
+		publisher = core_kafka.NoopPublisher{}
+		logger.Info("Kafka event publisher disabled")
+	}
+	defer publisher.Close()
+
 	//подключаем клиент Redis
 	logger.Debug("Initializing Redis client")
 	client, err := core_redis.NewClient(
@@ -91,7 +106,7 @@ func main() {
 	logger.Debug("Initializing feature", zap.String("feature", "tasks"))
 	tasksRepository := tasks_postgres_repository.NewTasksRepository(pool)
 	tasksService := tasks_service.NewTasksService(tasksRepository)
-	tasksTransportHTTP := tasks_transport_http.NewTasksHTTPHandler(tasksService)
+	tasksTransportHTTP := tasks_transport_http.NewTasksHTTPHandler(tasksService, publisher) //передаем publisher, чтобы сервис мог публиковать события в Kafka
 
 	//3. Начинаем выполнение фичи statistics
 	logger.Debug("Initializing feature", zap.String("feature", "statistics"))

@@ -3,10 +3,13 @@ package tasks_transport_http
 import (
 	"fmt"
 	"net/http"
+	"time"
 
+	core_kafka "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/kafka"
 	core_logger "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/logger"
 	core_http_request "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/request"
 	core_http_response "github.com/EmiliaKozlovskaya/golang-todoapp/internal/core/transport/http/response"
+	"go.uber.org/zap"
 )
 
 type GetTasksResponse []TaskDTOResponse
@@ -27,6 +30,8 @@ func (h *TasksHTTPHandler) GetTasks(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponder(log)
+	//для отправки в Kafka
+	requestedAt := time.Now().UTC()
 
 	//1. user_id
 	//2. limit        - получаем в качестве параметров из http запроса
@@ -52,6 +57,13 @@ func (h *TasksHTTPHandler) GetTasks(rw http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	event := core_kafka.NewTaskEvent(requestedAt, core_kafka.TasksListed)
+
+	if err := h.publisher.Publish(ctx, event); err != nil {
+		log.Warn("failed to publish task event", zap.Error(err))
+	}
+
 	//преобразуем массив tasksDomains в ответные ДТО TaskDTOResponse
 	response := GetTasksResponse(taskDTOsFromDomains(tasksDomains))
 

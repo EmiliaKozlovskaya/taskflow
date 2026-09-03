@@ -98,12 +98,11 @@ kafka-up:
 kafka-down:
 	@docker compose stop kafka
 
-
 kafka-worker-up:
 	@docker compose up -d --build kafka-worker
 
 kafka-worker-down:
-	@docker compose stop kafka-worker
+	@docker compose stop kafka-woker
 
 # логи кафки, чтобы видеть что происходит в брокере, -f - следить за логами в реальном времени
 kafka-logs:
@@ -122,7 +121,7 @@ kafka-topic-create:
 		--replication-factor 1 
 
 kafka-topic-list:
-	@docker compose exec kafka \
+	@docker compoose exec kafka \
 		/opt/kafka/bin/kafka-topics.sh \
 		--bootstrap-server kafka:9092 \
 		--list

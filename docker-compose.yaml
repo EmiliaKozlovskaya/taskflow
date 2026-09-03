@@ -27,6 +27,11 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_DB=${REDIS_DB}
       - REDIS_TIMEOUT=${REDIS_TIMEOUT}
+      # Kafka
+      - KAFKA_ENABLED=${KAFKA_ENABLED:-false}
+      - KAFKA_BROKERS=kafka:9092 #роутинг в сети идет по названиям docker compose сервисов, а эти все сервисы в одной докер сети
+      - KAFKA_TOPIC=${KAFKA_TOPIC:-todo.task-events}
+      - KAFKA_GROUP_ID=todo-kafka-worker
     volumes:
       - ${PROJECT_ROOT}/out/logs:/app/out/logs
     ports:
@@ -86,3 +91,45 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  kafka:
+    image: apache/kafka:3.9.2
+    container_name: todoapp-kafka
+    environment:
+      KAFKA_NODE_ID: 0
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@todoapp-kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CLUSTER_ID: "abcdefghijklmnopqrstuv"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+
+  kafka-worker:
+    build:
+      context: ${PROJECT_ROOT}
+      dockerfile: ${PROJECT_ROOT}/cmd/kafka-worker/Dockerfile
+    environment:
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_TOPIC=${KAFKA_TOPIC:-todo.task-events}
+      - KAFKA_GROUP_ID=todo-kafka-worker
+      - LOGGER_LEVEL=${LOGGER_LEVEL}
+      - LOGGER_FOLDER=/app/out/logs/kafka-worker
+    volumes:
+      - ${PROJECT_ROOT}/out/logs:/app/out/logs
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
